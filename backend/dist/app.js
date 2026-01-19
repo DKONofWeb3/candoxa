@@ -6,28 +6,19 @@ import postRoutes from "./routes/post.routes.js";
 import feedRoutes from "./routes/feed.routes.js";
 import engagementRoutes from "./routes/engagement.routes.js";
 import leaderboardRoutes from "./routes/leaderboard.routes.js";
-
-
 const app = express();
-
-app.use(
-  cors({
+app.use(cors({
     origin: "http://localhost:3000",
     credentials: true,
-  })
-);
-
+}));
 app.use(express.json());
-
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/feed", feedRoutes);
 app.use("/engagements", engagementRoutes);
 app.use("/leaderboard", leaderboardRoutes);
-
 app.get("/health", (_, res) => {
-  res.json({ status: "ok" });
+    res.json({ status: "ok" });
 });
-
 export default app;

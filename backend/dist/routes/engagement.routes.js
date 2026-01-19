@@ -1,9 +1,6 @@
 import { Router } from "express";
-import { createPost } from "../controllers/post.controller.js";
+import { engage } from "../controllers/engagement.controller.js";
 import { authMiddleware } from "../middleware/auth.js";
-
 const router = Router();
-
-router.post("/", authMiddleware, createPost);
-
+router.post("/", authMiddleware, engage);
 export default router;

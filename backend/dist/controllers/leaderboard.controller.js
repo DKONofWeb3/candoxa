@@ -1,0 +1,16 @@
+import prisma from "../utils/prisma.js";
+export const getLeaderboard = async (_req, res) => {
+    const users = await prisma.user.findMany({
+        orderBy: { points: "desc" },
+        take: 50,
+        select: {
+            id: true,
+            username: true,
+            points: true,
+        },
+    });
+    res.json(users.map((u) => ({
+        username: u.username,
+        points: u.points,
+    })));
+};

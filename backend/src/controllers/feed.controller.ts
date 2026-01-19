@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../utils/prisma";
+import prisma from "../utils/prisma.js";
 
 export const getFeed = async (_req: Request, res: Response) => {
   const posts = await prisma.post.findMany({
