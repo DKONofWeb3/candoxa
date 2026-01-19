@@ -29,11 +29,12 @@ export const signup = async (req: Request, res: Response) => {
     process.env.JWT_SECRET as string
   );
 
-  res.cookie("session", token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-  });
+res.cookie("session", token, {
+  httpOnly: true,
+  sameSite: "none",
+  secure: true,
+});
+
 
   res.json({ success: true });
 };
