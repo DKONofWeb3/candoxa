@@ -1,5 +1,7 @@
-import { Router } from "express";
-import { getLeaderboard } from "../controllers/leaderboard.controller.js";
-const router = Router();
-router.get("/", getLeaderboard);
-export default router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const leaderboard_controller_1 = require("../controllers/leaderboard.controller");
+const router = (0, express_1.Router)();
+router.get("/", leaderboard_controller_1.getLeaderboard);
+exports.default = router;

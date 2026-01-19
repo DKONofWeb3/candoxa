@@ -1,5 +1,7 @@
-import { Router } from "express";
-import { getFeed } from "../controllers/feed.controller.js";
-const router = Router();
-router.get("/", getFeed);
-export default router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const feed_controller_1 = require("../controllers/feed.controller");
+const router = (0, express_1.Router)();
+router.get("/", feed_controller_1.getFeed);
+exports.default = router;

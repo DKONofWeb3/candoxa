@@ -1,6 +1,6 @@
 import { Response } from "express";
-import prisma from "../utils/prisma.js";
-import { AuthRequest } from "../middleware/auth.js";
+import prisma from "../utils/prisma";
+import { AuthRequest } from "../middleware/auth";
 
 export const createPost = async (req: AuthRequest, res: Response) => {
   const { url, platform, description } = req.body;

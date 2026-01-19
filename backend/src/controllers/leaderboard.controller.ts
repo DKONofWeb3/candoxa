@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import prisma from "../utils/prisma.js";
+import prisma from "../utils/prisma";
 
 export const getLeaderboard = async (_req: Request, res: Response) => {
   const users = await prisma.user.findMany({

@@ -1,6 +1,12 @@
-import prisma from "../utils/prisma.js";
-export const getLeaderboard = async (_req, res) => {
-    const users = await prisma.user.findMany({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getLeaderboard = void 0;
+const prisma_1 = __importDefault(require("../utils/prisma"));
+const getLeaderboard = async (_req, res) => {
+    const users = await prisma_1.default.user.findMany({
         orderBy: { points: "desc" },
         take: 50,
         select: {
@@ -14,3 +20,4 @@ export const getLeaderboard = async (_req, res) => {
         points: u.points,
     })));
 };
+exports.getLeaderboard = getLeaderboard;

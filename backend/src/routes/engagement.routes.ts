@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { engage } from "../controllers/engagement.controller.js";
-import { authMiddleware } from "../middleware/auth.js";
+import { engage } from "../controllers/engagement.controller";
+import { authMiddleware } from "../middleware/auth";
 
 const router = Router();
 

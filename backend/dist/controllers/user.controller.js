@@ -1,6 +1,12 @@
-import prisma from "../utils/prisma.js";
-export const getMe = async (req, res) => {
-    const user = await prisma.user.findUnique({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getMyActivity = exports.getMe = void 0;
+const prisma_1 = __importDefault(require("../utils/prisma"));
+const getMe = async (req, res) => {
+    const user = await prisma_1.default.user.findUnique({
         where: { id: req.userId },
         include: {
             _count: {
@@ -23,9 +29,10 @@ export const getMe = async (req, res) => {
         avatar_url: null, // future-proof
     });
 };
-export const getMyActivity = async (req, res) => {
+exports.getMe = getMe;
+const getMyActivity = async (req, res) => {
     const userId = req.userId;
-    const engagements = await prisma.engagement.findMany({
+    const engagements = await prisma_1.default.engagement.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
         take: 20,
@@ -45,3 +52,4 @@ export const getMyActivity = async (req, res) => {
     }));
     res.json(activity);
 };
+exports.getMyActivity = getMyActivity;

@@ -1,15 +1,21 @@
-import prisma from "../utils/prisma.js";
-export const engage = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.engage = void 0;
+const prisma_1 = __importDefault(require("../utils/prisma"));
+const engage = async (req, res) => {
     const { postId, type } = req.body;
     if (!postId || !type) {
         return res.status(400).json({ message: "Missing fields" });
     }
-    const post = await prisma.post.findUnique({
+    const post = await prisma_1.default.post.findUnique({
         where: { id: postId },
     });
     if (!post)
         return res.status(404).json({ message: "Post not found" });
-    await prisma.engagement.create({
+    await prisma_1.default.engagement.create({
         data: {
             type,
             postId,
@@ -26,11 +32,11 @@ export const engage = async (req, res) => {
         engagerPoints = 1;
         authorPoints = 2;
     }
-    await prisma.user.update({
+    await prisma_1.default.user.update({
         where: { id: req.userId },
         data: { points: { increment: engagerPoints } },
     });
-    await prisma.user.update({
+    await prisma_1.default.user.update({
         where: { id: post.authorId },
         data: { points: { increment: authorPoints } },
     });
@@ -40,3 +46,4 @@ export const engage = async (req, res) => {
         points_awarded: engagerPoints,
     });
 };
+exports.engage = engage;

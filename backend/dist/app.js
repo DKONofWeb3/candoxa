@@ -1,24 +1,32 @@
-import express from "express";
-import cors from "cors";
-import authRoutes from "./routes/auth.routes.js";
-import userRoutes from "./routes/user.routes.js";
-import postRoutes from "./routes/post.routes.js";
-import feedRoutes from "./routes/feed.routes.js";
-import engagementRoutes from "./routes/engagement.routes.js";
-import leaderboardRoutes from "./routes/leaderboard.routes.js";
-const app = express();
-app.use(cors({
-    origin: "http://localhost:3000",
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const auth_routes_js_1 = __importDefault(require("./routes/auth.routes.js"));
+const user_routes_js_1 = __importDefault(require("./routes/user.routes.js"));
+const post_routes_js_1 = __importDefault(require("./routes/post.routes.js"));
+const feed_routes_js_1 = __importDefault(require("./routes/feed.routes.js"));
+const engagement_routes_js_1 = __importDefault(require("./routes/engagement.routes.js"));
+const leaderboard_routes_js_1 = __importDefault(require("./routes/leaderboard.routes.js"));
+const app = (0, express_1.default)();
+app.use((0, cors_1.default)({
+    origin: [
+        "http://localhost:3000",
+        "https://candoxa.vercel.app"
+    ],
     credentials: true,
 }));
-app.use(express.json());
-app.use("/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/posts", postRoutes);
-app.use("/feed", feedRoutes);
-app.use("/engagements", engagementRoutes);
-app.use("/leaderboard", leaderboardRoutes);
+app.use(express_1.default.json());
+app.use("/auth", auth_routes_js_1.default);
+app.use("/users", user_routes_js_1.default);
+app.use("/posts", post_routes_js_1.default);
+app.use("/feed", feed_routes_js_1.default);
+app.use("/engagements", engagement_routes_js_1.default);
+app.use("/leaderboard", leaderboard_routes_js_1.default);
 app.get("/health", (_, res) => {
     res.json({ status: "ok" });
 });
-export default app;
+exports.default = app;
