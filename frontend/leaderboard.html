@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Candoxa — Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: linear-gradient(to bottom, #030514, #050819);
+        color: white;
+        scroll-behavior: smooth;
+      }
+
+      .navbar-scroll {
+        background-color: rgba(3, 5, 20, 0.8);
+        backdrop-filter: blur(8px);
+      }
+
+      .table-row:hover {
+        background-color: rgba(10, 13, 24, 0.6);
+        transform: translateY(-2px);
+        transition: all 0.2s ease;
+      }
+
+      .frosted {
+        background: rgba(10, 13, 24, 0.7);
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+
+  <body class="overflow-x-hidden">
+    <!-- Navbar -->
+    <nav
+      id="navbar"
+      class="fixed top-0 w-full z-50 transition-all duration-500 bg-transparent"
+    >
+      <div
+        class="max-w-6xl mx-auto flex justify-between items-center py-5 px-6 text-white"
+      >
+        <div class="font-medium text-lg">Candoxa</div>
+        <div class="flex space-x-8 text-sm">
+          <a href="feed.html" class="hover:text-[#2563eb]">Feed</a>
+          <a href="profile.html" class="hover:text-[#2563eb]">Profile</a>
+          <a href="leaderboard.html" class="text-[#2563eb]">Leaderboard</a>
+          <a
+            href="share.html"
+            class="border border-white/30 px-4 py-2 rounded-md hover:bg-white/10 transition"
+            >Share</a
+          >
+<button
+  id="logout-btn"
+  class="text-sm text-gray-400 hover:text-red-400 transition"
+>
+  Log out
+</button>
+
+        </div>
+      </div>
+    </nav>
+
+    <!-- Leaderboard Section -->
+    <main class="pt-32 pb-20 px-6 max-w-4xl mx-auto text-center">
+      <h1 class="text-3xl font-medium mb-4">Leaderboard</h1>
+      <p class="text-gray-400 mb-10">
+        Top contributors who share thoughtful discoveries with the community.
+      </p>
+
+      <div class="frosted rounded-2xl overflow-hidden">
+        <table class="w-full border-collapse text-left text-gray-300">
+          <thead class="text-gray-400 border-b border-[#0e1324] text-sm">
+            <tr>
+              <th class="py-3 px-6">Rank</th>
+              <th class="py-3 px-6">Username</th>
+              <th class="py-3 px-6 text-right">Points</th>
+            </tr>
+          </thead>
+         <tbody id="leaderboard-body" class="text-sm">
+  <tr>
+    <td colspan="3" class="py-6 text-center text-gray-500 text-sm">
+      Loading leaderboard…
+    </td>
+  </tr>
+</tbody>
+
+        </table>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center text-gray-500 text-sm">
+      <p>© 2026 Candoxa. All rights reserved.</p>
+    </footer>
+
+   <script type="module">
+  import { requireAuth } from "./assets/js/guard.js";
+
+  await requireAuth();
+
+  const API_BASE =
+  location.hostname === "localhost"
+    ? "http://localhost:4000"
+    : "https://api.candoxa.com";
+
+
+  async function apiRequest(path) {
+    const res = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Failed to load");
+
+    return res.json();
+  }
+
+  // Navbar blur
+  window.addEventListener("scroll", () => {
+    const nav = document.getElementById("navbar");
+    nav.classList.toggle("navbar-scroll", window.scrollY > 50);
+  });
+
+  function renderRow(user, index) {
+    return `
+      <tr class="table-row border-b border-[#0e1324]" style="opacity:0; transform:translateY(15px)">
+        <td class="py-3 px-6 text-[#2563eb] font-medium">${index + 1}</td>
+        <td class="py-3 px-6">${user.username}</td>
+        <td class="py-3 px-6 text-right">${user.points}</td>
+      </tr>
+    `;
+  }
+
+  async function loadLeaderboard() {
+    const body = document.getElementById("leaderboard-body");
+
+    try {
+      const users = await apiRequest("/leaderboard");
+
+      body.innerHTML = "";
+
+      if (!users.length) {
+        body.innerHTML = `
+          <tr>
+            <td colspan="3" class="py-6 text-center text-gray-500 text-sm">
+              No rankings yet. Be the first to share.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      users.forEach((user, index) => {
+        body.insertAdjacentHTML("beforeend", renderRow(user, index));
+      });
+
+      // stagger animation
+      document.querySelectorAll(".table-row").forEach((row, i) => {
+        setTimeout(() => {
+          row.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+          row.style.opacity = 1;
+          row.style.transform = "translateY(0)";
+        }, i * 120);
+      });
+    } catch {
+      body.innerHTML = `
+        <tr>
+          <td colspan="3" class="py-6 text-center text-red-400 text-sm">
+            Failed to load leaderboard.
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  loadLeaderboard();
+</script>
+
+  </body>
+</html>

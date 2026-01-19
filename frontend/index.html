@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Candoxa — Discover Meaningful Content</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: linear-gradient(to bottom, #030514, #02040a);
+        color: white;
+        scroll-behavior: smooth;
+      }
+
+      .frosted {
+        backdrop-filter: blur(8px);
+        background: rgba(10, 13, 24, 0.7);
+      }
+
+      .gradient-depth {
+        background: radial-gradient(circle at top left, #0b0f20 0%, #030514 80%);
+      }
+
+      /* Navbar transition */
+      .navbar-scroll {
+        background-color: rgba(3, 5, 20, 0.8);
+        backdrop-filter: blur(8px);
+      }
+    </style>
+  </head>
+
+  <body class="overflow-x-hidden gradient-depth">
+    <!-- Navbar -->
+    <nav
+      id="navbar"
+      class="fixed top-0 w-full z-50 transition-all duration-500 bg-transparent"
+    >
+      <div
+        class="max-w-6xl mx-auto flex justify-between items-center py-5 px-6 text-white"
+      >
+        <div class="font-medium text-lg">Candoxa</div>
+        <div class="flex space-x-8 text-sm">
+          <a href="#features" class="hover:text-[#2563eb] transition">Features</a>
+          <a href="#how" class="hover:text-[#2563eb] transition">How it works</a>
+          <a
+            href="signup.html"
+            class="border border-white/30 px-4 py-2 rounded-md hover:bg-white/10 transition"
+            >Sign up</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section
+      id="hero"
+      class="pt-40 pb-28 text-center px-6 max-w-3xl mx-auto"
+    >
+      <h1
+        class="text-5xl font-semibold tracking-tight mb-4 leading-tight text-white"
+      >
+        Discover quality content, not engagement noise.
+      </h1>
+      <p class="text-[#b4b6bd] text-lg leading-relaxed mb-10">
+        Candoxa is a curated discovery platform where creators and professionals
+        find, share, and save valuable content.
+      </p>
+      <div class="flex justify-center space-x-6">
+        <button
+          class="bg-[#2563eb] hover:bg-[#1e4fd1] text-white font-medium rounded-md px-6 py-3 transition transform hover:scale-105"
+        >
+          Explore Candoxa
+        </button>
+        <button
+          class="border border-white/30 text-white font-medium rounded-md px-6 py-3 transition hover:bg-white/10"
+        >
+          Learn More
+        </button>
+      </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section id="features" class="py-28 px-6 max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div
+          class="frosted rounded-xl p-6 transition transform hover:-translate-y-1"
+        >
+          <h2 class="text-xl font-medium text-white mb-2">
+            Curated Discovery
+          </h2>
+          <h3 class="text-[#b4b6bd] text-sm mb-3">See only what matters</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Find insightful posts from X, LinkedIn, TikTok, and more — all in one
+            calm feed.
+          </p>
+        </div>
+
+        <div
+          class="frosted rounded-xl p-6 transition transform hover:-translate-y-1"
+        >
+          <h2 class="text-xl font-medium text-white mb-2">Personalized Flow</h2>
+          <h3 class="text-[#b4b6bd] text-sm mb-3">Curated for you</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Candoxa learns what you value, surfacing insights that align with your
+            interests.
+          </p>
+        </div>
+
+        <div
+          class="frosted rounded-xl p-6 transition transform hover:-translate-y-1"
+        >
+          <h2 class="text-xl font-medium text-white mb-2">Focused Interface</h2>
+          <h3 class="text-[#b4b6bd] text-sm mb-3">Designed for calm</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Minimal, distraction-free layout that rewards patience — not dopamine.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how" class="py-28 px-6 max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl font-medium mb-4">How Candoxa Works</h2>
+      <p class="text-gray-400 leading-relaxed mb-10">
+        Candoxa curates the web’s most thoughtful content and surfaces it through a
+        calm, meaningful interface.
+      </p>
+
+      <div class="space-y-8 text-left">
+        <div>
+          <h3 class="text-[#2563eb] font-medium mb-1">01 — Discover</h3>
+          <p class="text-gray-400 text-sm">
+            Explore a feed of insightful posts from credible creators across
+            platforms.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-[#2563eb] font-medium mb-1">02 — Save</h3>
+          <p class="text-gray-400 text-sm">
+            Keep what matters. Build a personal library of knowledge.
+          </p>
+        </div>
+        <div>
+          <h3 class="text-[#2563eb] font-medium mb-1">03 — Share</h3>
+          <p class="text-gray-400 text-sm">
+            Contribute meaningful content to others once you’ve earned enough
+            points.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signup Section -->
+    <section
+      id="signup"
+      class="py-28 bg-[#0a0d18] bg-opacity-70 backdrop-blur-sm text-center px-6"
+    >
+      <h2 class="text-2xl font-medium mb-4">Join Candoxa</h2>
+      <p class="text-gray-400 mb-10">
+        Be part of a new, quieter space for meaningful discovery.
+      </p>
+      <form
+        class="max-w-md mx-auto flex flex-col md:flex-row gap-4 justify-center"
+      >
+        <input
+          type="text"
+          placeholder="Your name"
+          class="bg-[#050812] text-white rounded-md px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          type="email"
+          placeholder="Email address"
+          class="bg-[#050812] text-white rounded-md px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          class="bg-[#2563eb] hover:bg-[#1e4fd1] text-white font-medium rounded-md px-6 py-3 transition transform hover:scale-105"
+        >
+          Sign Up
+        </button>
+      </form>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 text-center text-gray-500 text-sm">
+      <p>© 2026 Candoxa. All rights reserved.</p>
+    </footer>
+
+    <script>
+      // Navbar scroll effect
+      window.addEventListener("scroll", () => {
+        const nav = document.getElementById("navbar");
+        if (window.scrollY > 50) {
+          nav.classList.add("navbar-scroll");
+        } else {
+          nav.classList.remove("navbar-scroll");
+        }
+      });
+    </script>
+  </body>
+</html>
