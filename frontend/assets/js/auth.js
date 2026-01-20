@@ -3,14 +3,14 @@ import { api } from "./api.js";
 export async function signup(username, email, password) {
   return api("/auth/signup", {
     method: "POST",
-    body: { username, email, password }
+    body: { username, email, password },
   });
 }
 
 export async function login(email, password) {
   return api("/auth/login", {
     method: "POST",
-    body: { email, password }
+    body: { email, password },
   });
 }
 
@@ -19,5 +19,7 @@ export async function getMe() {
 }
 
 export async function logout() {
-  return api("/auth/logout", { method: "POST" });
+  return api("/auth/logout", {
+    method: "POST",
+  });
 }
