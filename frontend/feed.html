@@ -111,132 +111,97 @@
     <div id="points-toast" class="points-toast"></div>
 
     <!-- Script -->
-    <script type="module">
-      import { requireAuth } from "./assets/js/guard.js";
+   <script type="module">
+  import { requireAuth } from "./assets/js/guard.js";
+  import { api } from "./assets/js/api.js";
 
-      await requireAuth();
+  await requireAuth();
 
-      const API_BASE =
-        location.hostname === "localhost"
-          ? "http://localhost:4000"
-          : "https://api.candoxa.com";
+  function timeAgo(date) {
+    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
 
-      async function apiRequest(path, options = {}) {
-        const res = await fetch(`${API_BASE}${path}`, {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          ...options,
-        });
+  function showPoints(points) {
+    const toast = document.getElementById("points-toast");
+    toast.textContent = `+${points} points`;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 1200);
+  }
 
-        if (!res.ok) throw new Error("Request failed");
-        return res.json();
+  function renderPost(post) {
+    return `
+      <div class="feed-card frosted rounded-xl p-6">
+        <div class="flex justify-between mb-3 text-sm text-gray-500">
+          <span>${post.platform}</span>
+          <span>${timeAgo(post.created_at)}</span>
+        </div>
+
+        <h2 class="text-lg font-medium">${post.title}</h2>
+
+        <p class="text-gray-400 mt-2 text-sm">
+          ${post.description || ""}
+        </p>
+
+        <div class="flex space-x-6 mt-4 text-sm border-t border-[#0e1324] pt-3">
+          <button class="icon-btn" data-action="click" data-id="${post.id}" data-url="${post.url}">Open</button>
+          <button class="icon-btn" data-action="save" data-id="${post.id}">Keep</button>
+          <button class="icon-btn" data-action="like" data-id="${post.id}">Like</button>
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadFeed() {
+    const container = document.getElementById("feed");
+
+    try {
+      const posts = await api("/feed");
+      container.innerHTML = "";
+
+      if (!posts.length) {
+        container.innerHTML =
+          '<p class="text-center text-gray-500 text-sm">New discoveries coming soon.</p>';
+        return;
       }
 
-      function timeAgo(date) {
-        const diff = Math.floor((Date.now() - new Date(date)) / 1000);
-        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-        return `${Math.floor(diff / 86400)}d ago`;
-      }
+      posts.forEach(p =>
+        container.insertAdjacentHTML("beforeend", renderPost(p))
+      );
+    } catch {
+      container.innerHTML =
+        '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
+    }
+  }
 
-      function showPoints(points) {
-        const toast = document.getElementById("points-toast");
-        toast.textContent = `+${points} points`;
-        toast.classList.add("show");
+  async function engage(postId, type) {
+    const res = await api("/engagements", {
+      method: "POST",
+      body: { postId, type }
+    });
 
-        setTimeout(() => toast.classList.remove("show"), 1200);
-      }
+    if (res.points_awarded) showPoints(res.points_awarded);
+  }
 
-      function renderPost(post) {
-        return `
-          <div class="feed-card frosted rounded-xl p-6">
-            <div class="flex justify-between mb-3 text-sm text-gray-500">
-              <span>${post.platform}</span>
-              <span>${timeAgo(post.created_at)}</span>
-            </div>
+  document.addEventListener("click", e => {
+    const btn = e.target.closest(".icon-btn");
+    if (!btn) return;
 
-            <h2 class="text-white text-lg font-medium">
-              ${post.title}
-            </h2>
+    const { id, action, url } = btn.dataset;
 
-            <p class="text-gray-400 mt-2 text-sm leading-relaxed">
-              ${post.description || ""}
-            </p>
+    if (action === "click" && url) {
+      engage(id, "click");
+      window.open(url, "_blank");
+      return;
+    }
 
-            <div class="flex items-center space-x-6 mt-4 text-gray-500 text-sm border-t border-[#0e1324] pt-3">
-              <button class="icon-btn" data-action="click" data-id="${post.id}" data-url="${post.url}">
-                Open
-              </button>
-              <button class="icon-btn" data-action="save" data-id="${post.id}">
-                Keep for later
-              </button>
-              <button class="icon-btn" data-action="like" data-id="${post.id}">
-                Like
-              </button>
-            </div>
-          </div>
-        `;
-      }
+    engage(id, action);
+  });
 
-      async function loadFeed() {
-        const container = document.getElementById("feed");
+  loadFeed();
+</script>
 
-        try {
-          const posts = await apiRequest("/feed");
-          container.innerHTML = "";
-
-          if (!posts.length) {
-            container.innerHTML =
-              '<p class="text-center text-gray-500 text-sm">Take a breath. New discoveries await soon.</p>';
-            return;
-          }
-
-          posts.forEach((post) => {
-            container.insertAdjacentHTML("beforeend", renderPost(post));
-          });
-        } catch {
-          container.innerHTML =
-            '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
-        }
-      }
-
-      async function engage(postId, type) {
-        const res = await apiRequest("/engagements", {
-          method: "POST",
-          body: JSON.stringify({ postId, type }),
-        });
-
-        if (res.points_awarded) {
-          showPoints(res.points_awarded);
-        }
-      }
-
-      document.addEventListener("click", (e) => {
-        const btn = e.target.closest(".icon-btn");
-        if (!btn) return;
-
-        const { id, action, url } = btn.dataset;
-
-        btn.style.transform = "scale(1.1)";
-        btn.style.color = "#2563eb";
-        setTimeout(() => (btn.style.transform = "scale(1)"), 150);
-
-        if (action === "click" && url) {
-          engage(id, "click");
-          window.open(url, "_blank");
-          return;
-        }
-
-        engage(id, action);
-      });
-
-      window.addEventListener("scroll", () => {
-        document
-          .getElementById("navbar")
-          .classList.toggle("navbar-scroll", window.scrollY > 50);
-      });
-
-      loadFeed();
-    </script>
   </body>
 </html>

@@ -102,95 +102,72 @@
 
     <!-- Script -->
     <script type="module">
-      import { requireAuth } from "./assets/js/guard.js";
+  import { requireAuth } from "./assets/js/guard.js";
+  import { api } from "./assets/js/api.js";
 
-      await requireAuth();
+  await requireAuth();
 
-      const API_BASE =
-        location.hostname === "localhost"
-          ? "http://localhost:4000"
-          : "https://api.candoxa.com";
+  window.addEventListener("scroll", () => {
+    document
+      .getElementById("navbar")
+      .classList.toggle("navbar-scroll", window.scrollY > 50);
+  });
 
-      async function apiRequest(path) {
-        const res = await fetch(`${API_BASE}${path}`, {
-          credentials: "include",
-        });
-        if (!res.ok) throw new Error("Request failed");
-        return res.json();
-      }
+  function renderActivity(item) {
+    const labels = {
+      click: "You opened a discovery",
+      like: "You liked a discovery",
+      save: "You saved a discovery",
+    };
 
-      window.addEventListener("scroll", () => {
-        document
-          .getElementById("navbar")
-          .classList.toggle("navbar-scroll", window.scrollY > 50);
+    return `
+      <div class="feed-card frosted rounded-xl p-6">
+        <p class="text-xs text-gray-500 mb-2">
+          ${labels[item.type] || "You interacted"}
+        </p>
+        <p class="text-gray-400">${item.description}</p>
+      </div>
+    `;
+  }
+
+  async function loadProfile() {
+    const user = await api("/users/me");
+
+    document.getElementById("avatar").src =
+      user.avatar_url || "https://source.unsplash.com/100x100/?portrait";
+
+    document.getElementById("display-name").textContent =
+      user.display_name || user.username;
+
+    document.getElementById("username").textContent = "@" + user.username;
+    document.getElementById("points").textContent = user.points;
+
+    document.getElementById("joined").textContent =
+      new Date(user.joined_at).toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
       });
 
-      function renderActivity(item) {
-        const labels = {
-          click: "You opened a discovery",
-          like: "You liked a discovery",
-          save: "You saved a discovery",
-        };
+    document.getElementById("discoveries").textContent = user.discoveries;
+    document.getElementById("saved").textContent = user.saved;
 
-        return `
-          <div class="feed-card frosted rounded-xl p-6">
-            <p class="text-xs text-gray-500 mb-2">
-              ${labels[item.type] || "You interacted"}
-            </p>
-            <p class="text-gray-400 leading-relaxed">
-              ${item.description}
-            </p>
-          </div>
-        `;
-      }
+    const activity = await api("/users/me/activity");
+    const container = document.getElementById("activity-feed");
+    container.innerHTML = "";
 
-      async function loadProfile() {
-        const user = await apiRequest("/users/me");
+    if (!activity.length) {
+      container.innerHTML =
+        '<p class="text-gray-500 text-sm">No activity yet.</p>';
+      return;
+    }
 
-        document.getElementById("avatar").src =
-          user.avatar_url ||
-          "https://source.unsplash.com/100x100/?portrait";
+    activity.forEach(item =>
+      container.insertAdjacentHTML("beforeend", renderActivity(item))
+    );
+  }
 
-        document.getElementById("display-name").textContent =
-          user.display_name || user.username;
+  loadProfile();
+</script>
 
-        document.getElementById("username").textContent =
-          "@" + user.username;
-
-        document.getElementById("points").textContent = user.points;
-
-        document.getElementById("joined").textContent =
-          new Date(user.joined_at).toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          });
-
-        document.getElementById("discoveries").textContent =
-          user.discoveries;
-
-        document.getElementById("saved").textContent =
-          user.saved;
-
-        const activity = await apiRequest("/users/me/activity");
-        const container = document.getElementById("activity-feed");
-
-        container.innerHTML = "";
-
-        if (!activity.length) {
-          container.innerHTML =
-            '<p class="text-gray-500 text-sm">No activity yet.</p>';
-          return;
-        }
-
-        activity.forEach((item) => {
-          container.insertAdjacentHTML(
-            "beforeend",
-            renderActivity(item)
-          );
-        });
-      }
-
-      loadProfile();
-    </script>
   </body>
 </html>

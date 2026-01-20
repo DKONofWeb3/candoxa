@@ -98,37 +98,22 @@
       <p>© 2026 Candoxa. All rights reserved.</p>
     </footer>
 
-   <script type="module">
+<script type="module">
   import { requireAuth } from "./assets/js/guard.js";
+  import { api } from "./assets/js/api.js";
 
   await requireAuth();
 
-  const API_BASE =
-  location.hostname === "localhost"
-    ? "http://localhost:4000"
-    : "https://api.candoxa.com";
-
-
-  async function apiRequest(path) {
-    const res = await fetch(`${API_BASE}${path}`, {
-      credentials: "include",
-    });
-
-    if (!res.ok) throw new Error("Failed to load");
-
-    return res.json();
-  }
-
-  // Navbar blur
   window.addEventListener("scroll", () => {
-    const nav = document.getElementById("navbar");
-    nav.classList.toggle("navbar-scroll", window.scrollY > 50);
+    document
+      .getElementById("navbar")
+      .classList.toggle("navbar-scroll", window.scrollY > 50);
   });
 
   function renderRow(user, index) {
     return `
-      <tr class="table-row border-b border-[#0e1324]" style="opacity:0; transform:translateY(15px)">
-        <td class="py-3 px-6 text-[#2563eb] font-medium">${index + 1}</td>
+      <tr class="table-row border-b border-[#0e1324]">
+        <td class="py-3 px-6 text-[#2563eb]">${index + 1}</td>
         <td class="py-3 px-6">${user.username}</td>
         <td class="py-3 px-6 text-right">${user.points}</td>
       </tr>
@@ -139,46 +124,31 @@
     const body = document.getElementById("leaderboard-body");
 
     try {
-      const users = await apiRequest("/leaderboard");
-
+      const users = await api("/leaderboard");
       body.innerHTML = "";
 
       if (!users.length) {
         body.innerHTML = `
-          <tr>
-            <td colspan="3" class="py-6 text-center text-gray-500 text-sm">
-              No rankings yet. Be the first to share.
-            </td>
-          </tr>
-        `;
+          <tr><td colspan="3" class="py-6 text-center text-gray-500">
+            No rankings yet.
+          </td></tr>`;
         return;
       }
 
-      users.forEach((user, index) => {
-        body.insertAdjacentHTML("beforeend", renderRow(user, index));
-      });
-
-      // stagger animation
-      document.querySelectorAll(".table-row").forEach((row, i) => {
-        setTimeout(() => {
-          row.style.transition = "opacity 0.4s ease, transform 0.4s ease";
-          row.style.opacity = 1;
-          row.style.transform = "translateY(0)";
-        }, i * 120);
-      });
+      users.forEach((u, i) =>
+        body.insertAdjacentHTML("beforeend", renderRow(u, i))
+      );
     } catch {
       body.innerHTML = `
-        <tr>
-          <td colspan="3" class="py-6 text-center text-red-400 text-sm">
-            Failed to load leaderboard.
-          </td>
-        </tr>
-      `;
+        <tr><td colspan="3" class="py-6 text-center text-red-400">
+          Failed to load leaderboard.
+        </td></tr>`;
     }
   }
 
   loadLeaderboard();
 </script>
+
 
   </body>
 </html>

@@ -133,83 +133,67 @@
 
     <!-- Script -->
     <script type="module">
-      import { requireAuth } from "./assets/js/guard.js";
+  import { requireAuth } from "./assets/js/guard.js";
+  import { api } from "./assets/js/api.js";
 
-      await requireAuth();
+  await requireAuth();
 
-      const API_BASE =
-        location.hostname === "localhost"
-          ? "http://localhost:4000"
-          : "https://api.candoxa.com";
+  window.addEventListener("scroll", () => {
+    document
+      .getElementById("navbar")
+      .classList.toggle("navbar-scroll", window.scrollY > 50);
+  });
 
-      async function apiRequest(path, options = {}) {
-        const res = await fetch(`${API_BASE}${path}`, {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          ...options,
-        });
+  const form = document.getElementById("share-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const tooltip = document.getElementById("tooltip");
 
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.message || "Request failed");
-        return data;
-      }
+  async function loadUser() {
+    const user = await api("/users/me");
 
-      // Navbar blur
-      window.addEventListener("scroll", () => {
-        document
-          .getElementById("navbar")
-          .classList.toggle("navbar-scroll", window.scrollY > 50);
+    if (user.points >= 5) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("cursor-not-allowed", "bg-[#2563eb]/50");
+      submitBtn.classList.add("bg-[#2563eb]", "hover:bg-[#1e4fd1]");
+      tooltip.textContent = "Ready to share";
+    }
+  }
+
+  submitBtn.addEventListener("mouseenter", () => {
+    if (submitBtn.disabled) tooltip.classList.add("show");
+  });
+
+  submitBtn.addEventListener("mouseleave", () => {
+    tooltip.classList.remove("show");
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (submitBtn.disabled) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sharing…";
+
+    try {
+      await api("/posts", {
+        method: "POST",
+        body: {
+          url: document.getElementById("url").value.trim(),
+          platform: document.getElementById("platform").value,
+          description: document.getElementById("description").value.trim(),
+        },
       });
 
-      const form = document.getElementById("share-form");
-      const submitBtn = document.getElementById("submit-btn");
-      const tooltip = document.getElementById("tooltip");
+      window.location.href = "/feed.html";
+    } catch (err) {
+      alert(err.message || "Failed to share");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Share Discovery";
+    }
+  });
 
-      async function loadUser() {
-        const user = await apiRequest("/users/me");
+  loadUser();
+</script>
 
-        if (user.points >= 5) {
-          submitBtn.disabled = false;
-          submitBtn.classList.remove("cursor-not-allowed", "bg-[#2563eb]/50");
-          submitBtn.classList.add("bg-[#2563eb]", "hover:bg-[#1e4fd1]");
-          tooltip.textContent = "Ready to share";
-        }
-      }
-
-      submitBtn.addEventListener("mouseenter", () => {
-        if (submitBtn.disabled) tooltip.classList.add("show");
-      });
-
-      submitBtn.addEventListener("mouseleave", () => {
-        tooltip.classList.remove("show");
-      });
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        if (submitBtn.disabled) return;
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Sharing…";
-
-        try {
-          await apiRequest("/posts", {
-            method: "POST",
-            body: JSON.stringify({
-              url: document.getElementById("url").value.trim(),
-              platform: document.getElementById("platform").value,
-              description: document.getElementById("description").value.trim(),
-            }),
-          });
-
-          window.location.href = "/feed.html";
-        } catch (err) {
-          alert(err.message);
-          submitBtn.disabled = false;
-          submitBtn.textContent = "Share Discovery";
-        }
-      });
-
-      loadUser();
-    </script>
   </body>
 </html>

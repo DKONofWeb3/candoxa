@@ -86,7 +86,7 @@
       </p>
     </main>
 
- <script type="module">
+<script type="module">
   import { signup, login } from "./assets/js/auth.js";
 
   const form = document.getElementById("auth-form");
@@ -103,17 +103,13 @@
   toggleBtn.addEventListener("click", () => {
     isSignup = !isSignup;
 
-    if (isSignup) {
-      formTitle.textContent = "Create your Candoxa account";
-      toggleBtn.textContent = "Log In";
-      usernameInput.style.display = "block";
-      submitBtn.textContent = "Sign Up";
-    } else {
-      formTitle.textContent = "Welcome back to Candoxa";
-      toggleBtn.textContent = "Sign Up";
-      usernameInput.style.display = "none";
-      submitBtn.textContent = "Log In";
-    }
+    formTitle.textContent = isSignup
+      ? "Create your Candoxa account"
+      : "Welcome back to Candoxa";
+
+    toggleBtn.textContent = isSignup ? "Log In" : "Sign Up";
+    usernameInput.style.display = isSignup ? "block" : "none";
+    submitBtn.textContent = isSignup ? "Sign Up" : "Log In";
   });
 
   form.addEventListener("submit", async (e) => {
@@ -136,9 +132,8 @@
         );
       }
 
-      // Success → go to feed
       window.location.href = "/feed.html";
-    } catch (err) {
+    } catch {
       alert("Authentication failed");
     } finally {
       submitBtn.disabled = false;
@@ -146,6 +141,7 @@
     }
   });
 </script>
+
 
 
   </body>
