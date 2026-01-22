@@ -32,7 +32,7 @@ app.use("/posts", post_routes_js_1.default);
 app.use("/feed", feed_routes_js_1.default);
 app.use("/engagements", engagement_routes_js_1.default);
 app.use("/leaderboard", leaderboard_routes_js_1.default);
-app.get("/health", (_, res) => {
+app.get("/health", (_req, res) => {
     res.json({ status: "ok" });
 });
 exports.default = app;

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -36,7 +36,7 @@ app.use("/feed", feedRoutes);
 app.use("/engagements", engagementRoutes);
 app.use("/leaderboard", leaderboardRoutes);
 
-app.get("/health", (_, res) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
