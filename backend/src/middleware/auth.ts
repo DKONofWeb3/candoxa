@@ -5,25 +5,26 @@ export interface AuthRequest extends Request {
   userId?: string;
 }
 
-export const authMiddleware = (
+export function requireAuth(
   req: AuthRequest,
   res: Response,
   next: NextFunction
-) => {
-  const header = req.headers.authorization;
-  if (!header) return res.status(401).json({ message: "No token" });
+) {
+  const token = req.cookies?.token;
 
-  const token = header.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "No token" });
+  }
 
   try {
-    const decoded = jwt.verify(
+    const payload = jwt.verify(
       token,
       process.env.JWT_SECRET as string
     ) as { userId: string };
 
-    req.userId = decoded.userId;
+    req.userId = payload.userId;
     next();
   } catch {
-    res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
-};
+}

@@ -11,7 +11,11 @@ import leaderboardRoutes from "./routes/leaderboard.routes.js";
 
 const app = express();
 
+/**
+ * REQUIRED for Render / HTTPS cookies
+ */
 app.set("trust proxy", 1);
+
 app.use(
   cors({
     origin: [
@@ -22,10 +26,9 @@ app.use(
   })
 );
 
-app.use(cookieParser());
 app.use(express.json());
+app.use(cookieParser());
 
-// ROUTES
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
