@@ -81,6 +81,32 @@
         opacity: 1;
         transform: translateY(0);
       }
+      /* Skeleton loaders */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 37%,
+    #e5e7eb 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 14px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.skeleton-card {
+  height: 130px;
+}
+
     </style>
   </head>
 
@@ -118,9 +144,6 @@
       </h1>
 
       <div id="feed" class="space-y-8">
-        <p id="feed-status" class="text-center text-gray-500 text-sm">
-          Loading discoveries…
-        </p>
       </div>
     </main>
 
@@ -186,11 +209,11 @@
 
               <!-- Save -->
               <button
-                class="icon-btn"
-                title="Save"
-                data-action="save"
-                data-id="${post.id}"
-              >
+  class="icon-btn ${post.engagements?.saved ? "active" : ""}"
+  title="Save"
+  data-action="save"
+  data-id="${post.id}"
+>
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                   viewBox="0 0 24 24">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
@@ -198,12 +221,12 @@
               </button>
 
               <!-- Like -->
-              <button
-                class="icon-btn"
-                title="Like"
-                data-action="like"
-                data-id="${post.id}"
-              >
+             <button
+  class="icon-btn ${post.engagements?.saved ? "active" : ""}"
+  title="Save"
+  data-action="save"
+  data-id="${post.id}"
+>
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                   viewBox="0 0 24 24">
                   <path d="M14 9V5a3 3 0 00-6 0v4H4a2 2 0 00-2 2v2a2 2 0 002 2h4v6h8l4-8V9z"/>
@@ -215,26 +238,33 @@
       }
 
       async function loadFeed() {
-        const container = document.getElementById("feed");
+  const container = document.getElementById("feed");
 
-        try {
-          const posts = await api("/feed");
-          container.innerHTML = "";
+  // Show skeletons immediately
+  container.innerHTML = `
+    <div class="feed-card skeleton skeleton-card"></div>
+    <div class="feed-card skeleton skeleton-card"></div>
+    <div class="feed-card skeleton skeleton-card"></div>
+  `;
 
-          if (!posts.length) {
-            container.innerHTML =
-              '<p class="text-center text-gray-500 text-sm">New discoveries coming soon.</p>';
-            return;
-          }
+  try {
+    const posts = await api("/feed");
+    container.innerHTML = "";
 
-          posts.forEach(p =>
-            container.insertAdjacentHTML("beforeend", renderPost(p))
-          );
-        } catch {
-          container.innerHTML =
-            '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
-        }
-      }
+    if (!posts.length) {
+      container.innerHTML =
+        '<p class="text-center text-gray-500 text-sm">New discoveries coming soon.</p>';
+      return;
+    }
+
+    posts.forEach(p =>
+      container.insertAdjacentHTML("beforeend", renderPost(p))
+    );
+  } catch {
+    container.innerHTML =
+      '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
+  }
+}
 
       async function engage(postId, type) {
         const res = await api("/engagements", {
@@ -251,15 +281,15 @@
 
         const { id, action, url } = btn.dataset;
 
-        btn.classList.toggle("active");
-
         if (action === "click" && url) {
-          engage(id, "click");
-          window.open(url, "_blank", "noopener");
-          return;
-        }
+  engage(id, "click");
+  window.open(url, "_blank", "noopener");
+  return;
+}
 
-        engage(id, action);
+// Only like/save get visual state
+btn.classList.toggle("active");
+engage(id, action);
       });
 
       loadFeed();
