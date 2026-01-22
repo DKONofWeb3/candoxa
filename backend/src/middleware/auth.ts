@@ -5,7 +5,7 @@ export interface AuthRequest extends Request {
   userId?: string;
 }
 
-export function requireAuth(
+export function authMiddleware(
   req: AuthRequest,
   res: Response,
   next: NextFunction
@@ -17,12 +17,12 @@ export function requireAuth(
   }
 
   try {
-    const payload = jwt.verify(
+    const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET as string
     ) as { userId: string };
 
-    req.userId = payload.userId;
+    req.userId = decoded.userId;
     next();
   } catch {
     return res.status(401).json({ message: "Invalid token" });
