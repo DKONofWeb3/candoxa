@@ -34,6 +34,7 @@ export const getFeed = async (req: AuthRequest, res: Response) => {
       id: post.id,
       platform: post.platform,
       description: post.description,
+      author: post.author.username,
       url: post.url,
       created_at: post.createdAt,
       engagements: {

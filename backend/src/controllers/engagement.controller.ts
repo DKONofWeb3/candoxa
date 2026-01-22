@@ -9,11 +9,19 @@ export const engage = async (req: AuthRequest, res: Response) => {
     return res.status(400).json({ message: "Missing fields" });
   }
 
-  const post = await prisma.post.findUnique({
-    where: { id: postId },
-  });
+const post = await prisma.post.findUnique({
+  where: { id: postId },
+  select: { authorId: true },
+});
 
-  if (!post) return res.status(404).json({ message: "Post not found" });
+if (!post) {
+  return res.status(404).json({ message: "Post not found" });
+}
+
+if (post.authorId === req.userId) {
+  return res.json({ points_awarded: 0 });
+}
+
 
   await prisma.engagement.create({
     data: {
