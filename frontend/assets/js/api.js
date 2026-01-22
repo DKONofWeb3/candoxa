@@ -1,19 +1,21 @@
-import { API_BASE } from "./config.js";
-
 export async function api(path, options = {}) {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(API_URL + path, {
     method: options.method || "GET",
-    credentials: "include",
+    credentials: "include", // ✅ THIS IS THE FIX
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {}),
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(text || "Request failed");
+    let err;
+    try {
+      err = await res.json();
+    } catch {
+      err = { message: "Request failed" };
+    }
+    throw err;
   }
 
   return res.json();
