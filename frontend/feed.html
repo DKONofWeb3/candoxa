@@ -19,30 +19,53 @@
         scroll-behavior: smooth;
       }
 
-      .frosted {
-        background: rgba(10, 13, 24, 0.7);
+      .navbar-scroll {
+        background-color: rgba(3, 5, 20, 0.8);
         backdrop-filter: blur(8px);
+      }
+
+      /* Feed card */
+      .feed-card {
+        background: #f5f7fb;
+        color: #0f172a;
+        border-radius: 14px;
+        padding: 1.25rem 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       .feed-card:hover {
         transform: translateY(-3px) scale(1.01);
-        transition: transform 0.2s ease;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      }
+
+      /* Icon buttons */
+      .icon-btn {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 8px;
+        color: #475569;
+        transition: color 0.2s, box-shadow 0.2s, transform 0.15s;
       }
 
       .icon-btn:hover {
         color: #2563eb;
       }
 
-      .navbar-scroll {
-        background-color: rgba(3, 5, 20, 0.8);
-        backdrop-filter: blur(8px);
+      .icon-btn.active {
+        color: #2563eb;
+        box-shadow: 0 0 14px rgba(37, 99, 235, 0.8);
+        transform: scale(1.15);
       }
 
+      /* Points toast */
       .points-toast {
         position: fixed;
         bottom: 24px;
         right: 24px;
-        background: rgba(10, 13, 24, 0.9);
+        background: rgba(10, 13, 24, 0.95);
         border: 1px solid #0e1324;
         color: #2563eb;
         padding: 10px 14px;
@@ -67,9 +90,7 @@
       id="navbar"
       class="fixed top-0 w-full z-50 transition-all duration-500 bg-transparent"
     >
-      <div
-        class="max-w-6xl mx-auto flex justify-between items-center py-5 px-6"
-      >
+      <div class="max-w-6xl mx-auto flex justify-between items-center py-5 px-6">
         <div class="font-medium text-lg">Candoxa</div>
         <div class="flex space-x-8 text-sm">
           <a href="feed.html" class="text-[#2563eb]">Feed</a>
@@ -81,12 +102,11 @@
             >Share</a
           >
           <button
-  id="logout-btn"
-  class="text-sm text-gray-400 hover:text-red-400 transition"
->
-  Log out
-</button>
-
+            id="logout-btn"
+            class="text-sm text-gray-400 hover:text-red-400 transition"
+          >
+            Log out
+          </button>
         </div>
       </div>
     </nav>
@@ -111,97 +131,138 @@
     <div id="points-toast" class="points-toast"></div>
 
     <!-- Script -->
-   <script type="module">
-  import { requireAuth } from "./assets/js/guard.js";
-  import { api } from "./assets/js/api.js";
+    <script type="module">
+      import { requireAuth } from "./assets/js/guard.js";
+      import { api } from "./assets/js/api.js";
 
-  await requireAuth();
+      await requireAuth();
 
-  function timeAgo(date) {
-    const diff = Math.floor((Date.now() - new Date(date)) / 1000);
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
-    return `${Math.floor(diff / 86400)}d ago`;
-  }
+      window.addEventListener("scroll", () => {
+        document
+          .getElementById("navbar")
+          .classList.toggle("navbar-scroll", window.scrollY > 50);
+      });
 
-  function showPoints(points) {
-    const toast = document.getElementById("points-toast");
-    toast.textContent = `+${points} points`;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 1200);
-  }
-
-  function renderPost(post) {
-    return `
-      <div class="feed-card frosted rounded-xl p-6">
-        <div class="flex justify-between mb-3 text-sm text-gray-500">
-          <span>${post.platform}</span>
-          <span>${timeAgo(post.created_at)}</span>
-        </div>
-
-        <h2 class="text-lg font-medium">${post.title}</h2>
-
-        <p class="text-gray-400 mt-2 text-sm">
-          ${post.description || ""}
-        </p>
-
-        <div class="flex space-x-6 mt-4 text-sm border-t border-[#0e1324] pt-3">
-          <button class="icon-btn" data-action="click" data-id="${post.id}" data-url="${post.url}">Open</button>
-          <button class="icon-btn" data-action="save" data-id="${post.id}">Keep</button>
-          <button class="icon-btn" data-action="like" data-id="${post.id}">Like</button>
-        </div>
-      </div>
-    `;
-  }
-
-  async function loadFeed() {
-    const container = document.getElementById("feed");
-
-    try {
-      const posts = await api("/feed");
-      container.innerHTML = "";
-
-      if (!posts.length) {
-        container.innerHTML =
-          '<p class="text-center text-gray-500 text-sm">New discoveries coming soon.</p>';
-        return;
+      function timeAgo(date) {
+        const diff = Math.floor((Date.now() - new Date(date)) / 1000);
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return `${Math.floor(diff / 86400)}d ago`;
       }
 
-      posts.forEach(p =>
-        container.insertAdjacentHTML("beforeend", renderPost(p))
-      );
-    } catch {
-      container.innerHTML =
-        '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
-    }
-  }
+      function showPoints(points) {
+        const toast = document.getElementById("points-toast");
+        toast.textContent = `+${points} points`;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1200);
+      }
 
-  async function engage(postId, type) {
-    const res = await api("/engagements", {
-      method: "POST",
-      body: { postId, type }
-    });
+      function renderPost(post) {
+        return `
+          <div class="feed-card">
+            <div class="flex justify-between mb-3 text-xs text-slate-500">
+              <span>${post.platform}</span>
+              <span>${timeAgo(post.created_at)}</span>
+            </div>
 
-    if (res.points_awarded) showPoints(res.points_awarded);
-  }
+            <p class="text-sm leading-relaxed mb-3">
+              ${post.description || "No description provided."}
+            </p>
 
-  document.addEventListener("click", e => {
-    const btn = e.target.closest(".icon-btn");
-    if (!btn) return;
+            <div class="flex space-x-6 border-t border-slate-200 pt-3">
+              <!-- Open -->
+              <button
+                class="icon-btn"
+                title="Open"
+                data-action="click"
+                data-id="${post.id}"
+                data-url="${post.url}"
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M7 17L17 7M7 7h10v10"/>
+                </svg>
+              </button>
 
-    const { id, action, url } = btn.dataset;
+              <!-- Save -->
+              <button
+                class="icon-btn"
+                title="Save"
+                data-action="save"
+                data-id="${post.id}"
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                </svg>
+              </button>
 
-    if (action === "click" && url) {
-      engage(id, "click");
-      window.open(url, "_blank");
-      return;
-    }
+              <!-- Like -->
+              <button
+                class="icon-btn"
+                title="Like"
+                data-action="like"
+                data-id="${post.id}"
+              >
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path d="M14 9V5a3 3 0 00-6 0v4H4a2 2 0 00-2 2v2a2 2 0 002 2h4v6h8l4-8V9z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }
 
-    engage(id, action);
-  });
+      async function loadFeed() {
+        const container = document.getElementById("feed");
 
-  loadFeed();
-</script>
+        try {
+          const posts = await api("/feed");
+          container.innerHTML = "";
 
+          if (!posts.length) {
+            container.innerHTML =
+              '<p class="text-center text-gray-500 text-sm">New discoveries coming soon.</p>';
+            return;
+          }
+
+          posts.forEach(p =>
+            container.insertAdjacentHTML("beforeend", renderPost(p))
+          );
+        } catch {
+          container.innerHTML =
+            '<p class="text-center text-red-400 text-sm">Failed to load feed.</p>';
+        }
+      }
+
+      async function engage(postId, type) {
+        const res = await api("/engagements", {
+          method: "POST",
+          body: { postId, type },
+        });
+
+        if (res.points_awarded) showPoints(res.points_awarded);
+      }
+
+      document.addEventListener("click", e => {
+        const btn = e.target.closest(".icon-btn");
+        if (!btn) return;
+
+        const { id, action, url } = btn.dataset;
+
+        btn.classList.toggle("active");
+
+        if (action === "click" && url) {
+          engage(id, "click");
+          window.open(url, "_blank", "noopener");
+          return;
+        }
+
+        engage(id, action);
+      });
+
+      loadFeed();
+    </script>
   </body>
 </html>
