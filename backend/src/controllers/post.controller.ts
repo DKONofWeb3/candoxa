@@ -9,12 +9,26 @@ export const createPost = async (req: AuthRequest, res: Response) => {
     return res.status(400).json({ message: "Missing fields" });
   }
 
+  if (!req.userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   const user = await prisma.user.findUnique({
     where: { id: req.userId },
   });
 
-  if (!user || user.points < 5) {
-    return res.status(403).json({ message: "Not enough points to post" });
+  if (!user) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // 🔓 Relax restriction in non-production environments
+  const MIN_POINTS_TO_POST =
+    process.env.NODE_ENV === "production" ? 5 : 0;
+
+  if (user.points < MIN_POINTS_TO_POST) {
+    return res
+      .status(403)
+      .json({ message: "Not enough points to post" });
   }
 
   const post = await prisma.post.create({
@@ -26,9 +40,8 @@ export const createPost = async (req: AuthRequest, res: Response) => {
     },
   });
 
- res.json({
-  success: true,
-  postId: post.id,
-});
-
+  res.json({
+    success: true,
+    postId: post.id,
+  });
 };
