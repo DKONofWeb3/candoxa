@@ -132,12 +132,14 @@
     </footer>
 
     <!-- Script -->
-    <script type="module">
+<script type="module">
   import { requireAuth } from "./assets/js/guard.js";
   import { api } from "./assets/js/api.js";
 
+  // Ensure user is authenticated
   await requireAuth();
 
+  // Navbar scroll effect
   window.addEventListener("scroll", () => {
     document
       .getElementById("navbar")
@@ -151,11 +153,21 @@
   async function loadUser() {
     const user = await api("/users/me");
 
-    if (user.points >= 5) {
+    // Treat localhost as non-production
+    const IS_PRODUCTION =
+      location.hostname !== "localhost" &&
+      !location.hostname.includes("vercel.app");
+
+    const MIN_POINTS_TO_POST = IS_PRODUCTION ? 5 : 0;
+
+    if (user.points >= MIN_POINTS_TO_POST) {
       submitBtn.disabled = false;
       submitBtn.classList.remove("cursor-not-allowed", "bg-[#2563eb]/50");
       submitBtn.classList.add("bg-[#2563eb]", "hover:bg-[#1e4fd1]");
       tooltip.textContent = "Ready to share";
+    } else {
+      submitBtn.disabled = true;
+      tooltip.textContent = "Earn more points to unlock sharing";
     }
   }
 
@@ -180,7 +192,9 @@
         body: {
           url: document.getElementById("url").value.trim(),
           platform: document.getElementById("platform").value,
-          description: document.getElementById("description").value.trim(),
+          description: document
+            .getElementById("description")
+            .value.trim(),
         },
       });
 
@@ -194,6 +208,7 @@
 
   loadUser();
 </script>
+
 
   </body>
 </html>
