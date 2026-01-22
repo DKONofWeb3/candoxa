@@ -21,11 +21,15 @@ export const createPost = async (req: AuthRequest, res: Response) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  // 🔓 Relax restriction in non-production environments
-  const MIN_POINTS_TO_POST =
-    process.env.NODE_ENV === "production" ? 5 : 0;
+  /**
+   * Feature flag:
+   * - REQUIRE_POINTS_FOR_POSTS=true  → enforce points
+   * - REQUIRE_POINTS_FOR_POSTS=false → allow posting freely
+   */
+  const REQUIRE_POINTS =
+    process.env.REQUIRE_POINTS_FOR_POSTS === "true";
 
-  if (user.points < MIN_POINTS_TO_POST) {
+  if (REQUIRE_POINTS && user.points < 5) {
     return res
       .status(403)
       .json({ message: "Not enough points to post" });
