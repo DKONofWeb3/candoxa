@@ -7,6 +7,13 @@ exports.logout = exports.login = exports.signup = void 0;
 const prisma_1 = __importDefault(require("../utils/prisma"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const COOKIE_NAME = "token";
+const cookieOptions = {
+    httpOnly: true,
+    secure: true, // REQUIRED on Vercel
+    sameSite: "none",
+    path: "/",
+};
 const signup = async (req, res) => {
     const { username, email, password } = req.body;
     if (!username || !email || !password) {
@@ -22,12 +29,8 @@ const signup = async (req, res) => {
     const user = await prisma_1.default.user.create({
         data: { username, email, password: hashed },
     });
-    const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET);
-    res.cookie("session", token, {
-        httpOnly: true,
-        sameSite: "none",
-        secure: true,
-    });
+    const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    res.cookie(COOKIE_NAME, token, cookieOptions);
     res.json({ success: true });
 };
 exports.signup = signup;
@@ -41,21 +44,13 @@ const login = async (req, res) => {
     if (!valid) {
         return res.status(401).json({ message: "Invalid credentials" });
     }
-    const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET);
-    res.cookie("session", token, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-    });
+    const token = jsonwebtoken_1.default.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    res.cookie(COOKIE_NAME, token, cookieOptions);
     res.json({ success: true });
 };
 exports.login = login;
 const logout = async (_req, res) => {
-    res.clearCookie("session", {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-    });
+    res.clearCookie(COOKIE_NAME, cookieOptions);
     res.json({ success: true });
 };
 exports.logout = logout;
