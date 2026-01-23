@@ -118,27 +118,55 @@
     >
       <div class="max-w-6xl mx-auto flex justify-between items-center py-5 px-6">
         <div class="font-medium text-lg">Candoxa</div>
-        <div class="flex space-x-8 text-sm">
-          <a href="feed.html" class="text-[#2563eb]">Feed</a>
-          <a href="profile.html" class="hover:text-[#2563eb]">Profile</a>
-          <a href="leaderboard.html" class="hover:text-[#2563eb]">Leaderboard</a>
-          <a
-            href="share.html"
-            class="border border-white/30 px-4 py-2 rounded-md hover:bg-white/10 transition"
-            >Share</a
-          >
-          <button
-            id="logout-btn"
-            class="text-sm text-gray-400 hover:text-red-400 transition"
-          >
-            Log out
-          </button>
-        </div>
+      <!-- Desktop nav -->
+<div class="hidden md:flex space-x-8 text-sm items-center">
+  <a href="feed.html" class="text-[#2563eb]">Feed</a>
+  <a href="profile.html" class="hover:text-[#2563eb]">Profile</a>
+  <a href="leaderboard.html" class="hover:text-[#2563eb]">Leaderboard</a>
+  <a
+    href="share.html"
+    class="border border-white/30 px-4 py-2 rounded-md hover:bg-white/10 transition"
+  >
+    Share
+  </a>
+  <button
+    id="logout-btn"
+    class="text-sm text-gray-400 hover:text-red-400 transition"
+  >
+    Log out
+  </button>
+</div>
+
+<!-- Mobile hamburger -->
+<button
+  id="menu-btn"
+  class="md:hidden text-white focus:outline-none"
+>
+  ☰
+</button>
+
       </div>
     </nav>
+<div
+  id="mobile-menu"
+  class="hidden fixed top-20 left-0 w-full bg-[#030514] border-t border-white/10 z-40"
+>
+  <div class="flex flex-col px-6 py-4 space-y-4 text-sm">
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Profile</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="share.html">Share</a>
+    <button
+      id="mobile-logout-btn"
+      class="text-left text-red-400"
+    >
+      Log out
+    </button>
+  </div>
+</div>
 
     <!-- Feed -->
-    <main class="pt-32 pb-20 px-6 max-w-3xl mx-auto">
+    <main class="pt-24 md:pt-32 pb-20 px-6 max-w-3xl mx-auto">
       <h1 class="text-3xl font-medium mb-10 text-center">
         Your Discovery Feed
       </h1>
@@ -165,6 +193,23 @@
           .getElementById("navbar")
           .classList.toggle("navbar-scroll", window.scrollY > 50);
       });
+
+      
+  /* ---------------- MOBILE MENU ---------------- */
+  const menuBtn = document.getElementById("menu-btn");
+  const mobileMenu = document.getElementById("mobile-menu");
+
+  // open / close menu
+  menuBtn?.addEventListener("click", () => {
+    mobileMenu.classList.toggle("hidden");
+  });
+
+  // close menu after clicking a link or logout
+  mobileMenu?.addEventListener("click", e => {
+    if (e.target.tagName === "A" || e.target.tagName === "BUTTON") {
+      mobileMenu.classList.add("hidden");
+    }
+  });
 
       function timeAgo(date) {
         const diff = Math.floor((Date.now() - new Date(date)) / 1000);
@@ -237,6 +282,22 @@
           </div>
         `;
       }
+
+      async function logout() {
+  try {
+    await api("/logout", { method: "POST" });
+  } finally {
+    window.location.href = "index.html"; // or login.html
+  }
+}
+
+document
+  .getElementById("logout-btn")
+  ?.addEventListener("click", logout);
+
+document
+  .getElementById("mobile-logout-btn")
+  ?.addEventListener("click", logout);
 
       async function loadFeed() {
   const container = document.getElementById("feed");
